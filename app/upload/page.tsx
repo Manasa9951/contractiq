@@ -1,4 +1,25 @@
+"use client";
+
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+
 export default function UploadPage() {
+  const [fileName, setFileName] = useState("");
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length > 0) {
+      setFileName(acceptedFiles[0].name);
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/pdf": [".pdf"],
+    },
+    multiple: false,
+  });
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
       <h1 className="text-4xl font-bold mb-4">
@@ -9,12 +30,23 @@ export default function UploadPage() {
         Upload your contract and get an AI-powered analysis.
       </p>
 
-      <div className="border-2 border-dashed rounded-xl p-12 w-full max-w-xl text-center">
-        <p>Drag and drop a PDF here</p>
+      <div
+        {...getRootProps()}
+        className="border-2 border-dashed rounded-xl p-12 w-full max-w-xl text-center cursor-pointer"
+      >
+        <input {...getInputProps()} />
 
-        <button className="mt-4 bg-black text-white px-4 py-2 rounded">
-          Choose File
-        </button>
+        {isDragActive ? (
+          <p>Drop the PDF here...</p>
+        ) : (
+          <p>Drag & drop a PDF here, or click to select one</p>
+        )}
+
+        {fileName && (
+          <p className="mt-4 font-semibold">
+            Selected: {fileName}
+          </p>
+        )}
       </div>
     </main>
   );
